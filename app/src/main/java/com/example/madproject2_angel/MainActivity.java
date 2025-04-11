@@ -1,4 +1,5 @@
 package com.example.madproject2_angel;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
@@ -35,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 convert();
+            }
+        });
+        Button settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -80,5 +89,6 @@ public class MainActivity extends AppCompatActivity {
             default: return value;
         }
     }
+
 }
 

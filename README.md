@@ -1,4 +1,4 @@
-# Project 1 - Unit Converter App
+# Project 2 - Unit Converter App(settings page to switch theme)
 
 ## By:
 - Name: Angel Rao

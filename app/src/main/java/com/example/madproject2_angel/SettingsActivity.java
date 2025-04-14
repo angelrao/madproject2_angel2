@@ -1,9 +1,9 @@
 package com.example.madproject2_angel;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -13,18 +13,18 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        // Load saved theme preference
+        // ✅ Apply saved theme before setContentView
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
         boolean isDark = prefs.getBoolean("dark_mode", false);
         AppCompatDelegate.setDefaultNightMode(
                 isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
         themeSwitch = findViewById(R.id.themeSwitch);
-        themeSwitch.setChecked(isDark); // Set switch based on saved preference
+        themeSwitch.setChecked(isDark);
 
         themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -33,9 +33,10 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.putBoolean("dark_mode", isChecked);
                 editor.apply();
 
-                // Apply the theme
                 AppCompatDelegate.setDefaultNightMode(
                         isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
+                // No need to call recreate() here — MainActivity handles it
             }
         });
     }

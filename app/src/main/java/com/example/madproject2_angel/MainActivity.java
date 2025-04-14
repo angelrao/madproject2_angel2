@@ -1,58 +1,72 @@
 package com.example.madproject2_angel;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.madproject2_angel.R;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Declare UI Components
-    EditText inputValue;           // For entering the value to convert
-    Spinner fromUnitSpinner;       // Dropdown for selecting source unit
-    Spinner toUnitSpinner;         // Dropdown for selecting target unit
-    Button convertButton;          // Button to perform conversion
-    TextView resultText;           // To display the result
+    EditText inputValue;
+    Spinner fromUnitSpinner, toUnitSpinner;
+    Button convertButton;
+    TextView resultText;
     String[] units = {"Metre", "Centimetre", "Inch", "Foot", "Yard"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // ✅ Apply theme before super.onCreate and setContentView
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        boolean isDark = prefs.getBoolean("dark_mode", false);
+        AppCompatDelegate.setDefaultNightMode(
+                isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-// Linking UI components with their IDs from XML
+
+        // Link UI
         inputValue = findViewById(R.id.inputValue);
         fromUnitSpinner = findViewById(R.id.fromUnitSpinner);
         toUnitSpinner = findViewById(R.id.toUnitSpinner);
         convertButton = findViewById(R.id.convertButton);
         resultText = findViewById(R.id.resultText);
-// Creating Adapter for spinners using units array
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, units);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         fromUnitSpinner.setAdapter(adapter);
         toUnitSpinner.setAdapter(adapter);
-// Perform conversion when Convert button is clicked
-        convertButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                convert();
-            }
-        });
+
+        convertButton.setOnClickListener(v -> convert());
+
         Button settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
-            }
+        settingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         });
     }
-    /*
-         Method to convert the entered value from one unit to another
-         */
+
+    // 🔄 Reload theme if user changes it in Settings
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        boolean isDark = prefs.getBoolean("dark_mode", false);
+        int currentMode = AppCompatDelegate.getDefaultNightMode();
+        int desiredMode = isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
+
+        if (currentMode != desiredMode) {
+            AppCompatDelegate.setDefaultNightMode(desiredMode);
+            recreate(); // Apply updated theme without flicker
+        }
+    }
+
     private void convert() {
         String inputStr = inputValue.getText().toString().trim();
-// Check if input is empty
         if (inputStr.isEmpty()) {
             resultText.setText("Please enter a value.");
             return;
@@ -64,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         double metreValue = toMetres(input, fromUnit);
         double result = fromMetres(metreValue, toUnit);
-// Display final result with 4 decimal places
+
         resultText.setText("Result : " + String.format("%.4f", result) + " " + toUnit);
     }
 
@@ -74,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
             case "Inch": return value * 0.0254;
             case "Foot": return value * 0.3048;
             case "Yard": return value * 0.9144;
-            case "Metre":
             default: return value;
         }
     }
@@ -85,10 +98,8 @@ public class MainActivity extends AppCompatActivity {
             case "Inch": return value / 0.0254;
             case "Foot": return value / 0.3048;
             case "Yard": return value / 0.9144;
-            case "Metre":
             default: return value;
         }
     }
-
 }
 
